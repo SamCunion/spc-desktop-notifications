@@ -65,6 +65,7 @@ namespace spc_desktop_notifications
         static void OnApplyConfigClicked(object? sender, EventArgs e)
         {
             Console.WriteLine("Apply Config clicked.");
+            ConfigManager.Update();
         }
     }
 }

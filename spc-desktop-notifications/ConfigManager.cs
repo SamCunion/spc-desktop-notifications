@@ -8,6 +8,11 @@ namespace spc_desktop_notifications
     {
 
         public static readonly string cfgPath = Path.Combine(AppContext.BaseDirectory, "settings.cfg");
+        public static NotificationMode mode = NotificationMode.GLOBAL;
+        public static Point location = new Point(39.5f, -98.35f);
+        public static string state = "KS";
+        public static List<SevereWarnings> warnings = new List<SevereWarnings>();
+
 
         private static readonly string cfgDefaultText = "" +
             "# spc-desktop-notifications config file\n" +
@@ -35,6 +40,7 @@ namespace spc_desktop_notifications
             "#'FF' (Flash Flood Warning),\n" +
             "warnings=TORE,PDSTOR,TORO,TORR,EDSSTW,DSTW,CSTW,STW,FFE,FF";
 
+        //Initiates the config manager by creating the default config file if required, and reading the config state from the config file.
         public static void Init()
         {
             //check if the config file exists, if not, create it and fill it with default values
@@ -43,13 +49,159 @@ namespace spc_desktop_notifications
                 Console.WriteLine("Config file not found. Creating a default config file.");
                 File.WriteAllText(cfgPath, cfgDefaultText);
             }
+
+            //update the config state
+            Update();
         }
 
-        public static string GetSetting(string name)
+        //updates the ConfigManager attributes with the values read from the config file.
+        public static void Update()
         {
-            return "";
-        }
+            //read the lines in the config file
+            foreach (var line in File.ReadAllLines(cfgPath))
+            {
+                //skip lines that start with "#" or whitespace
+                if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
+                {
+                    continue;
+                }
 
+                //split the line at the "=" symbol
+                var pair = line.Split("=", 2);
+
+                //if theres more than 2 parts, the syntax is invalid and is skipped.
+                if (pair.Length != 2)
+                {
+                    Console.WriteLine("Error parsing config line: More than 2 sections divided by '=': " + line);
+                    continue;
+                }
+
+                var option = pair[0].Trim();
+                var value = pair[1].Trim();
+
+                //update state by option
+                if (option.ToLower().Equals("mode")) //mode
+                {
+                    if (value.ToLower().Equals("point"))
+                    {
+                        mode = NotificationMode.POINT;
+                        Console.WriteLine("MODE set to " + mode);
+                    }
+                    else if (value.ToLower().Equals("state"))
+                    {
+                        mode = NotificationMode.STATE;
+                        Console.WriteLine("MODE set to " + mode);
+                    }
+                    else if (value.ToLower().Equals("global"))
+                    {
+                        mode = NotificationMode.GLOBAL;
+                        Console.WriteLine("MODE set to " + mode);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error setting mode, option was invalid: " + mode);
+                    }
+                }
+                else if (option.ToLower().Equals("location")) //location
+                {
+                    var latlon = value.Split(",");
+                    if (latlon.Length != 2)
+                    {
+                        Console.WriteLine("Error setting location, more than two ',' encountered in line: " + line);
+                        continue;
+                    }
+
+                    try
+                    {
+                        var lat = float.Parse(latlon[0]);
+                        var lon = float.Parse(latlon[1]);
+                        location = new Point(lat, lon);
+                        Console.WriteLine("Location set to " + lat + "," + lon);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error parsing lat or lon value in line: " + line);
+                        continue;
+                    }
+                }
+                else if (option.ToLower().Equals("state")) //state
+                {
+                    if (value.Length != 2)
+                    {
+                        Console.WriteLine("Error parsing state, value is not of length 2: " + line);
+                        continue;
+                    }
+                    state = value.ToUpper();
+                    Console.WriteLine("State set to " + state);
+                }
+                else if (option.ToLower().Equals("warnings")) // warnings
+                {
+                    warnings.Clear(); //clear the previous warnings
+                    var warningIds = value.ToUpper().Split(",");
+                    foreach (var w in warningIds)
+                    {
+                        switch (w)
+                        {
+                            case "TORE":
+                                warnings.Add(SevereWarnings.TORE);
+                                break;
+                            case "PDSTOR":
+                                warnings.Add(SevereWarnings.PDSTOR);
+                                break;
+                            case "TORO":
+                                warnings.Add(SevereWarnings.TORO);
+                                break;
+                            case "TORR":
+                                warnings.Add(SevereWarnings.TORR);
+                                break;
+                            case "EDSSTW":
+                                warnings.Add(SevereWarnings.EDSSTW);
+                                break;
+                            case "DSTW":
+                                warnings.Add(SevereWarnings.DSTW);
+                                break;
+                            case "CSTW":
+                                warnings.Add(SevereWarnings.CSTW);
+                                break;
+                            case "STW":
+                                warnings.Add(SevereWarnings.STW);
+                                break;
+                            case "FFE":
+                                warnings.Add(SevereWarnings.FFE);
+                                break;
+                            case "FF":
+                                warnings.Add(SevereWarnings.FF);
+                                break;
+                            default:
+                                continue;
+                        }
+                        Console.WriteLine("Added " + w + " to warning list");
+                    }
+                }
+            }
+        }
 
     }
+
+    internal enum NotificationMode
+    {
+        POINT,
+        STATE,
+        GLOBAL,
+    }
+
+    internal enum SevereWarnings
+    {
+        TORE,
+        PDSTOR,
+        TORO,
+        TORR,
+        EDSSTW,
+        DSTW,
+        CSTW,
+        STW,
+        FFE,
+        FF
+    }
+
 }
