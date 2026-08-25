@@ -8,6 +8,7 @@ namespace spc_desktop_notifications
     {
 
         private static NotifyIcon? trayIcon;
+        private static SpcDesktopNotifications app;
 
         [STAThread]
         static void Main(string[] args)
@@ -18,7 +19,7 @@ namespace spc_desktop_notifications
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-            SpcDesktopNotifications app = new SpcDesktopNotifications();
+            app = new SpcDesktopNotifications();
 
 
             //context menu
@@ -65,7 +66,8 @@ namespace spc_desktop_notifications
         static void OnApplyConfigClicked(object? sender, EventArgs e)
         {
             Console.WriteLine("Apply Config clicked.");
-            ConfigManager.Update();
+            app.Stop();
+            app = new SpcDesktopNotifications();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace spc_desktop_notifications
 
         public static readonly string cfgPath = Path.Combine(AppContext.BaseDirectory, "settings.cfg");
         public static NotificationMode mode = NotificationMode.GLOBAL;
-        public static Point location = new Point(39.5f, -98.35f);
+        public static GeoPoint location = new GeoPoint(39.5f, -98.35f);
         public static string state = "KS";
         public static List<SevereWarnings> warnings = new List<SevereWarnings>();
 
@@ -33,7 +33,7 @@ namespace spc_desktop_notifications
             "#'TORO' (Observed Tornado Warning),\n" +
             "#'TORR' (Radar Indicated Tornado Warning),\n" +
             "#'EDSSTW' (Extremely Dangerous Situation Severe Thunderstorm Warning)\n" +
-            "#'DSTW' (Destructuve Severe Thunderstorm Warning),\n" +
+            "#'DSTW' (Destructive Severe Thunderstorm Warning),\n" +
             "#'CSTW' (Considerable Severe Thunderstorm Warning),\n" +
             "#'STW' (Severe Thunderstorm Warning)\n" +
             "#'FFE' (Flash Flood Emergency),\n" +
@@ -80,19 +80,19 @@ namespace spc_desktop_notifications
                 var value = pair[1].Trim();
 
                 //update state by option
-                if (option.ToLower().Equals("mode")) //mode
+                if (option.ToLower() == "mode") //mode
                 {
-                    if (value.ToLower().Equals("point"))
+                    if (value.ToLower() == "point")
                     {
                         mode = NotificationMode.POINT;
                         Console.WriteLine("MODE set to " + mode);
                     }
-                    else if (value.ToLower().Equals("state"))
+                    else if (value.ToLower() == "state")
                     {
                         mode = NotificationMode.STATE;
                         Console.WriteLine("MODE set to " + mode);
                     }
-                    else if (value.ToLower().Equals("global"))
+                    else if (value.ToLower() == "global")
                     {
                         mode = NotificationMode.GLOBAL;
                         Console.WriteLine("MODE set to " + mode);
@@ -102,7 +102,7 @@ namespace spc_desktop_notifications
                         Console.WriteLine("Error setting mode, option was invalid: " + mode);
                     }
                 }
-                else if (option.ToLower().Equals("location")) //location
+                else if (option.ToLower() == "location") //location
                 {
                     var latlon = value.Split(",");
                     if (latlon.Length != 2)
@@ -115,7 +115,7 @@ namespace spc_desktop_notifications
                     {
                         var lat = float.Parse(latlon[0]);
                         var lon = float.Parse(latlon[1]);
-                        location = new Point(lat, lon);
+                        location = new GeoPoint(lat, lon);
                         Console.WriteLine("Location set to " + lat + "," + lon);
                     }
                     catch (Exception e)
@@ -124,7 +124,7 @@ namespace spc_desktop_notifications
                         continue;
                     }
                 }
-                else if (option.ToLower().Equals("state")) //state
+                else if (option.ToLower() == "state") //state
                 {
                     if (value.Length != 2)
                     {
@@ -134,7 +134,7 @@ namespace spc_desktop_notifications
                     state = value.ToUpper();
                     Console.WriteLine("State set to " + state);
                 }
-                else if (option.ToLower().Equals("warnings")) // warnings
+                else if (option.ToLower() == "warnings") // warnings
                 {
                     warnings.Clear(); //clear the previous warnings
                     var warningIds = value.ToUpper().Split(",");
