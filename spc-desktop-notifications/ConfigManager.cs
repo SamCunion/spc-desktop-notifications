@@ -9,9 +9,11 @@ namespace spc_desktop_notifications
 
         public static readonly string cfgPath = Path.Combine(AppContext.BaseDirectory, "settings.cfg");
         public static NotificationMode mode = NotificationMode.GLOBAL;
+        public static bool onlyShowMostSevere = false;
         public static GeoPoint location = new GeoPoint(39.5f, -98.35f);
         public static string state = "KS";
         public static List<SevereWarnings> warnings = new List<SevereWarnings>();
+        public static readonly List<SevereWarnings> warningTypeSeverityOrder = new List<SevereWarnings>() { SevereWarnings.TORE, SevereWarnings.PDSTOR, SevereWarnings.EDSSTW, SevereWarnings.FFE, SevereWarnings.DSTW, SevereWarnings.TORO, SevereWarnings.FFC, SevereWarnings.CSTW, SevereWarnings.TORR, SevereWarnings.STW, SevereWarnings.FF }; //subjective opinion, probably temporary
 
 
         private static readonly string cfgDefaultText = "" +
@@ -20,6 +22,9 @@ namespace spc_desktop_notifications
             "\n" +
             "# mode - determines the scope of your alerts. Options are Point, State, or Global.\n" +
             "mode=Global\n" +
+            "\n" +
+            "# onlyShowMostSevere - whether only the most severe alert issued in the last 30 seconds shows a notification, or all alerts from the last 30 seconds show a notification.\n" +
+            "onlyShowMostSevere=false\n" +
             "\n" +
             "# location - provide the latitude and longitude of the location you want Point alerts for. Does not matter if mode is set to State or Global.\n" +
             "location=39.5,-98.35\n" +
@@ -37,8 +42,9 @@ namespace spc_desktop_notifications
             "#'CSTW' (Considerable Severe Thunderstorm Warning),\n" +
             "#'STW' (Severe Thunderstorm Warning)\n" +
             "#'FFE' (Flash Flood Emergency),\n" +
+            "#'FFC' (Considerable Flash Flood Warning),\n" +
             "#'FF' (Flash Flood Warning),\n" +
-            "warnings=TORE,PDSTOR,TORO,TORR,EDSSTW,DSTW,CSTW,STW,FFE,FF";
+            "warnings=TORE,PDSTOR,TORO,TORR,EDSSTW,DSTW,CSTW,STW,FFE,FFC,FF";
 
         //Initiates the config manager by creating the default config file if required, and reading the config state from the config file.
         public static void Init()
@@ -169,6 +175,9 @@ namespace spc_desktop_notifications
                             case "FFE":
                                 warnings.Add(SevereWarnings.FFE);
                                 break;
+                            case "FFC":
+                                warnings.Add(SevereWarnings.FFC);
+                                break;
                             case "FF":
                                 warnings.Add(SevereWarnings.FF);
                                 break;
@@ -176,6 +185,17 @@ namespace spc_desktop_notifications
                                 continue;
                         }
                         Console.WriteLine("Added " + w + " to warning list");
+                    }
+                }
+                else if (option.ToLower() == "onlyshowmostsevere")
+                {
+                    if (value.ToLower() == "true")
+                    {
+                        onlyShowMostSevere = true;
+                    }
+                    else
+                    {
+                        onlyShowMostSevere = false;
                     }
                 }
             }
@@ -201,6 +221,7 @@ namespace spc_desktop_notifications
         CSTW,
         STW,
         FFE,
+        FFC,
         FF
     }
 
