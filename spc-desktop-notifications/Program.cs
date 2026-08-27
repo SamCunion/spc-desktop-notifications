@@ -1,6 +1,4 @@
-﻿using System.Windows.Forms;
-using System.Drawing;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.Windows.AppLifecycle;
 
 namespace spc_desktop_notifications
