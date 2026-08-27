@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Forms;
+using Microsoft.Windows.AppLifecycle;
 
 namespace spc_desktop_notifications
 {
@@ -130,12 +131,21 @@ namespace spc_desktop_notifications
                     //dont consider warnings that arent "actual" and of type "alert" (i.e culls test or excersise warnings as well as cancel message types)
                     if (w.Properties.Status == "Actual" && (w.Properties.MessageType == "Alert" || w.Properties.MessageType == "Update"))
                     {
+                        //if update notifications are turned off, continue
+                        if (!ConfigManager.notifyOnWarningUpdate && w.Properties.MessageType == "Update")
+                        {
+                            continue;
+                        }
+
                         //if a previous warning has the same ID as this warning, its already been considered
                         if (previousWarnings.Where(_w => _w.ID == w.ID).ToList().Count == 0)
                         {
-                            //warnings that reach this stage are valid
+                            //check if the type of warning is a type thats been specified by the user
                             w.SetWarningType();
-                            validWarnings.Add(w);
+                            if (ConfigManager.warnings.Contains(w.warningType))
+                            {
+                                validWarnings.Add(w);
+                            }
                         }
                     }
                 }
@@ -204,6 +214,7 @@ namespace spc_desktop_notifications
             var notification = new AppNotificationBuilder()
                 .AddArgument("action", "viewItem")
                 .AddText(commonName)
+                .AddText(Properties.Headline)
                 .AddText(Properties.Description)
                 .BuildNotification();
 

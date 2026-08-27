@@ -1,6 +1,7 @@
 ﻿using System.Windows.Forms;
 using System.Drawing;
 using System.Diagnostics;
+using Microsoft.Windows.AppLifecycle;
 
 namespace spc_desktop_notifications
 {
@@ -15,6 +16,12 @@ namespace spc_desktop_notifications
         {
             Console.WriteLine("Hello, World!");
 
+            //check if this app was opened from a notification click, if so, close this instance.
+            if (AppInstance.GetInstances().Count > 1)
+            {
+                return;
+            }
+
             //system tray functions
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -24,7 +31,7 @@ namespace spc_desktop_notifications
 
             //context menu
             var trayMenu = new ContextMenuStrip();
-            trayMenu.Items.Add("Show config", null, OnShowConfigClicked);
+            trayMenu.Items.Add("Open config", null, OnOpenConfigClicked);
             trayMenu.Items.Add("Apply config", null, OnApplyConfigClicked);
             trayMenu.Items.Add("Exit", null, OnExitClicked);
 
@@ -48,10 +55,10 @@ namespace spc_desktop_notifications
             Application.Exit();
         }
 
-        //event triggers when the "Show Config" button is clicked on the tray icon context menu
-        static void OnShowConfigClicked(object? sender, EventArgs e)
+        //event triggers when the "Open Config" button is clicked on the tray icon context menu
+        static void OnOpenConfigClicked(object? sender, EventArgs e)
         {
-            Console.WriteLine("Show Config clicked.");
+            Console.WriteLine("Open Config clicked.");
             try
             {
                 Process.Start(new ProcessStartInfo { FileName = ConfigManager.cfgPath, UseShellExecute = true });

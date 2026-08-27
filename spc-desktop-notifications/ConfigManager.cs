@@ -10,6 +10,7 @@ namespace spc_desktop_notifications
         public static readonly string cfgPath = Path.Combine(AppContext.BaseDirectory, "settings.cfg");
         public static NotificationMode mode = NotificationMode.GLOBAL;
         public static bool onlyShowMostSevere = false;
+        public static bool notifyOnWarningUpdate = true;
         public static GeoPoint location = new GeoPoint(39.5f, -98.35f);
         public static string state = "KS";
         public static List<SevereWarnings> warnings = new List<SevereWarnings>();
@@ -25,6 +26,9 @@ namespace spc_desktop_notifications
             "\n" +
             "# onlyShowMostSevere - whether only the most severe alert issued in the last 30 seconds shows a notification, or all alerts from the last 30 seconds show a notification.\n" +
             "onlyShowMostSevere=false\n" +
+            "\n" +
+            "# notifyOnWarningUpdate - whether updates to existing warnings trigger a new notification\n" +
+            "notifyOnWarningUpdate=true\n" +
             "\n" +
             "# location - provide the latitude and longitude of the location you want Point alerts for. Does not matter if mode is set to State or Global.\n" +
             "location=39.5,-98.35\n" +
@@ -196,6 +200,17 @@ namespace spc_desktop_notifications
                     else
                     {
                         onlyShowMostSevere = false;
+                    }
+                }
+                else if (option.ToLower() == "notifyonwarningupdate")
+                {
+                    if (value.ToLower() == "true")
+                    {
+                        notifyOnWarningUpdate = true;
+                    }
+                    else
+                    {
+                        notifyOnWarningUpdate = false;
                     }
                 }
             }
